@@ -7,8 +7,7 @@ package Library.Application.Project.UserAuthentication;
 
 import Database.Connection.Helper.Interfaces.*;
 import Database.Connection.Helper.DatabaseConnectionService;
-import Library.Application.Project.FacultyHomePage;
-import Library.Application.Project.StudentHomePage;
+import Library.Application.Project.UserHomePage;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -137,6 +136,7 @@ public class LoginPage extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void signupButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signupButtonActionPerformed
@@ -155,12 +155,12 @@ public class LoginPage extends javax.swing.JFrame {
                 if (UserAuthenticationHelper.IsUserStudent(usernameTextbox.getText())){
                     String studentNo = usernameTextbox.getText();
                     this.dispose();
-                    new StudentHomePage(studentNo).setVisible(true);
+                    new UserHomePage(studentNo, UserType.Student).setVisible(true);
                 }
                 if (UserAuthenticationHelper.IsUserFaculty(usernameTextbox.getText())){
                     String facultyNo = usernameTextbox.getText();
                     this.dispose();
-                    new FacultyHomePage(facultyNo).setVisible(true);
+                    new UserHomePage(facultyNo, UserType.Faculty).setVisible(true);
                 }
             }
             ClearUsernamePasswordTextBox();

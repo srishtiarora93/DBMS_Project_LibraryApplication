@@ -5,6 +5,7 @@
  */
 package Library.Application.Project.Publications;
 
+import Library.Application.Project.UserAuthentication.UserType;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
@@ -135,10 +136,12 @@ public class JournalsPage extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void detailsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_detailsButtonActionPerformed
         int selectedRow = journalsTable.getSelectedRow();
+        if(selectedRow == -1) return;
         String bookId = (String)journalsTable.getModel().getValueAt(selectedRow, 0);
         String bookType = (String)journalsTable.getModel().getValueAt(selectedRow, 1);
         String tableName = getTableName(bookType);

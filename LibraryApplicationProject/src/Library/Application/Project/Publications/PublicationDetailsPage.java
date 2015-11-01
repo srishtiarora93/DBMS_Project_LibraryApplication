@@ -5,6 +5,7 @@
  */
 package Library.Application.Project.Publications;
 
+import Library.Application.Project.UserAuthentication.UserType;
 import Database.Connection.Helper.DatabaseConnectionService;
 import Database.Connection.Helper.Interfaces.*;
 import java.util.ArrayList;
@@ -171,6 +172,7 @@ public class PublicationDetailsPage extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void goBackButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goBackButtonActionPerformed

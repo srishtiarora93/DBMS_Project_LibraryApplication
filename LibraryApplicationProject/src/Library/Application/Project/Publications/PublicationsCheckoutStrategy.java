@@ -5,6 +5,8 @@
  */
 package Library.Application.Project.Publications;
 
+import Library.Application.Project.UserAuthentication.UserType;
+
 /**
  *
  * @author jordy

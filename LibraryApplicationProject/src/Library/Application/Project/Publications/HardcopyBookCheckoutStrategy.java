@@ -5,6 +5,7 @@
  */
 package Library.Application.Project.Publications;
 
+import Library.Application.Project.UserAuthentication.UserType;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;

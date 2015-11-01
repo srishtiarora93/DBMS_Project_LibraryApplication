@@ -5,6 +5,7 @@
  */
 package Library.Application.Project.Publications;
 
+import Library.Application.Project.UserAuthentication.UserType;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
@@ -135,6 +136,7 @@ public class ConferencePapersPage extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void goBackButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goBackButtonActionPerformed
@@ -144,6 +146,7 @@ public class ConferencePapersPage extends javax.swing.JFrame {
 
     private void detailsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_detailsButtonActionPerformed
         int selectedRow = conferencePapersTable.getSelectedRow();
+        if(selectedRow == -1) return;
         String bookId = (String)conferencePapersTable.getModel().getValueAt(selectedRow, 0);
         String bookType = (String)conferencePapersTable.getModel().getValueAt(selectedRow, 1);
         String tableName = getTableName(bookType);
