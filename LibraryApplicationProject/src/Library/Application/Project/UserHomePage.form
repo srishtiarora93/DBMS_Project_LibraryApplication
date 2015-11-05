@@ -120,16 +120,25 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Checked-out Resources"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkedoutButtonActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="requestedButton">
           <Properties>
             <Property name="text" type="java.lang.String" value="Resource Request"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="requestedButtonActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="dueButton">
           <Properties>
             <Property name="text" type="java.lang.String" value="Due-Balance"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dueButtonActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

@@ -7,6 +7,7 @@ package Library.Application.Project.UserAuthentication;
 
 import Database.Connection.Helper.Interfaces.*;
 import Database.Connection.Helper.DatabaseConnectionService;
+import Library.Application.Project.Dues.DuesPage;
 import Library.Application.Project.UserHomePage;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -154,6 +155,12 @@ public class LoginPage extends javax.swing.JFrame {
             if (IsValidUser(DatabaseConnectionService.createHashService())){
                 if (UserAuthenticationHelper.IsUserStudent(usernameTextbox.getText())){
                     String studentNo = usernameTextbox.getText();
+                    if (UserAuthenticationHelper.IsStudentAccountHeld(studentNo)){
+                        ClearUsernamePasswordTextBox();
+                        this.setVisible(false);
+                        new DuesPage(this, studentNo, UserType.Student).setVisible(true);
+                        return;
+                    }
                     this.dispose();
                     new UserHomePage(studentNo, UserType.Student).setVisible(true);
                 }

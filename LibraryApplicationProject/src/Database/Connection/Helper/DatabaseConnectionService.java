@@ -28,4 +28,8 @@ public class DatabaseConnectionService {
     public static IDatabaseMetaDataHandler createDatabaseMetaDataHandler(IDatabaseConnection connection){
         return new DatabaseMetaDataHandler(connection);
     }
+    
+    public static ICallableStatement CreateCallableStmt(IDatabaseConnection connection, String jobquery) {
+        return new CallableStmt(connection, jobquery);
+    }
 }

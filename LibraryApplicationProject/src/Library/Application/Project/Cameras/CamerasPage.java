@@ -9,6 +9,7 @@ import Library.Application.Project.UserAuthentication.UserType;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -35,6 +36,8 @@ public class CamerasPage extends javax.swing.JFrame {
         this.m_UserResourcesPage = userResourcesPage;
         this.m_UserId = userId;
         this.m_UserType = userType;
+        
+        camerasTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         CreateTableModel();
         PopulateCamerasTable();
     }

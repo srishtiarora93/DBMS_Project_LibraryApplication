@@ -285,6 +285,23 @@ class CheckoutStrategyHelper{
             }
         }
     }
+    
+    static void DeleteBookFromWaitlist(String waitlistTable, 
+            String bookId, 
+            String userId) 
+    throws Exception{
+        try (IDatabaseConnection connection = DatabaseConnectionService.createDatabaseConnection()) {
+            try (IStatementExecutor stmtExecutor = DatabaseConnectionService.createStatementExecutor(connection)){
+                String waitlist = String.format("DELETE FROM %s "
+                        + "WHERE %s = '%s' AND "
+                        + "%s = '%s'",
+                        waitlistTable, 
+                        "USERID", userId,
+                        "BOOKID", bookId);
+                stmtExecutor.executeUpdate(waitlist);
+            }
+        }
+    }
 
     static void RenewBook(String tableName, 
             String bookId, String colNameBookId, 

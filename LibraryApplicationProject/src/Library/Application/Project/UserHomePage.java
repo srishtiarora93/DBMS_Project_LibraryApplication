@@ -5,6 +5,10 @@
  */
 package Library.Application.Project;
 
+import Library.Application.Project.CheckedoutResources.CheckedoutResourcesPage;
+import Library.Application.Project.Dues.DuesPage;
+import Library.Application.Project.Notifications.NotificationsPage;
+import Library.Application.Project.ResourceRequests.ResourceRequestsPage;
 import Library.Application.Project.UserAuthentication.LoginPage;
 import Library.Application.Project.UserAuthentication.UserType;
 
@@ -76,10 +80,25 @@ public class UserHomePage extends javax.swing.JFrame {
         });
 
         checkedoutButton.setText("Checked-out Resources");
+        checkedoutButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkedoutButtonActionPerformed(evt);
+            }
+        });
 
         requestedButton.setText("Resource Request");
+        requestedButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                requestedButtonActionPerformed(evt);
+            }
+        });
 
         dueButton.setText("Due-Balance");
+        dueButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dueButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -159,10 +178,24 @@ public class UserHomePage extends javax.swing.JFrame {
     }//GEN-LAST:event_logOutButtonActionPerformed
 
     private void notificationsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_notificationsButtonActionPerformed
-        // TODO add your handling code here:
-        //this.setVisible(false);
-        //new StudentMessagesPage(this, s_StudentNo).setVisible(true);
+        this.setVisible(false);
+        new NotificationsPage(this, m_UserId).setVisible(true);
     }//GEN-LAST:event_notificationsButtonActionPerformed
+
+    private void checkedoutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkedoutButtonActionPerformed
+        this.setVisible(false);
+        new CheckedoutResourcesPage(this, m_UserId, m_UserType).setVisible(true);
+    }//GEN-LAST:event_checkedoutButtonActionPerformed
+
+    private void dueButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dueButtonActionPerformed
+        this.setVisible(false);
+        new DuesPage(this, m_UserId, m_UserType).setVisible(true);
+    }//GEN-LAST:event_dueButtonActionPerformed
+
+    private void requestedButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_requestedButtonActionPerformed
+        this.setVisible(false);
+        new ResourceRequestsPage(this, m_UserId, m_UserType).setVisible(true);
+    }//GEN-LAST:event_requestedButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton checkedoutButton;

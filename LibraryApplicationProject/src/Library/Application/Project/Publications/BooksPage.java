@@ -9,6 +9,7 @@ import Library.Application.Project.UserAuthentication.UserType;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -34,6 +35,8 @@ public class BooksPage extends javax.swing.JFrame {
         this.m_PublicationsPage = publicationsPage;
         this.m_UserId = userId;
         this.m_UserType = UserType;
+        
+        booksTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         CreateTableModel();
         PopulateBooksTable();
     }
@@ -114,6 +117,7 @@ public class BooksPage extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void detailsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_detailsButtonActionPerformed

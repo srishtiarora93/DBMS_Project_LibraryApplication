@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -42,7 +43,10 @@ public class RoomsFilterPage extends javax.swing.JFrame {
         this.m_UserId = userId;
         this.m_UserType = userType;
         this.m_RoomsType = roomsType;
+        
+        roomsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         CreateTableModel();
+        reserveButton.setEnabled(false);
     }
     
     private void CreateTableModel() {
@@ -79,6 +83,9 @@ public class RoomsFilterPage extends javax.swing.JFrame {
         capacitySpinner = new javax.swing.JSpinner();
         goBackButton = new javax.swing.JButton();
         reserveButton = new javax.swing.JButton();
+        reservedRoomsButton = new javax.swing.JButton();
+        checkoutButton = new javax.swing.JButton();
+        checkinButton = new javax.swing.JButton();
 
         jLabel1.setText("jLabel1");
 
@@ -129,6 +136,27 @@ public class RoomsFilterPage extends javax.swing.JFrame {
             }
         });
 
+        reservedRoomsButton.setText("Reserved Rooms");
+        reservedRoomsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                reservedRoomsButtonActionPerformed(evt);
+            }
+        });
+
+        checkoutButton.setText("Checkout");
+        checkoutButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkoutButtonActionPerformed(evt);
+            }
+        });
+
+        checkinButton.setText("Checkin");
+        checkinButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkinButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -139,20 +167,23 @@ public class RoomsFilterPage extends javax.swing.JFrame {
                         .addGap(55, 55, 55)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(roomsLabel)
+                                .addGap(18, 18, 18)
+                                .addComponent(invisibleLabel))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(fromLabel)
                                     .addComponent(toLabel)
                                     .addComponent(capacityLabel))
                                 .addGap(86, 86, 86)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(findRoomsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(reservedRoomsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(toSpinner)
                                     .addComponent(fromSpinner)
-                                    .addComponent(capacitySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(roomsLabel)
-                                .addGap(18, 18, 18)
-                                .addComponent(invisibleLabel))))
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(capacitySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(0, 0, Short.MAX_VALUE))
+                                    .addComponent(findRoomsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -160,7 +191,11 @@ public class RoomsFilterPage extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(23, 23, 23)
                 .addComponent(goBackButton)
+                .addGap(18, 18, 18)
+                .addComponent(checkoutButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(checkinButton)
+                .addGap(18, 18, 18)
                 .addComponent(reserveButton)
                 .addGap(27, 27, 27))
         );
@@ -182,7 +217,9 @@ public class RoomsFilterPage extends javax.swing.JFrame {
                     .addComponent(capacitySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(34, 34, 34)
                 .addComponent(findRoomsButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(reservedRoomsButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(roomsLabel, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(invisibleLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -191,7 +228,9 @@ public class RoomsFilterPage extends javax.swing.JFrame {
                 .addGap(31, 31, 31)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(goBackButton)
-                    .addComponent(reserveButton))
+                    .addComponent(reserveButton)
+                    .addComponent(checkoutButton)
+                    .addComponent(checkinButton))
                 .addContainerGap())
         );
 
@@ -232,6 +271,7 @@ public class RoomsFilterPage extends javax.swing.JFrame {
         invisibleLabel.setText("");
         ClearAllRowsInTable();
         PopulateRoomsTable();
+        reserveButton.setEnabled(true);
     }//GEN-LAST:event_findRoomsButtonActionPerformed
 
     private void goBackButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goBackButtonActionPerformed
@@ -241,11 +281,11 @@ public class RoomsFilterPage extends javax.swing.JFrame {
 
     private void reserveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveButtonActionPerformed
         try {
-        int selectedRow = roomsTable.getSelectedRow();
-        if(selectedRow == -1){
-            invisibleLabel.setText("Please select a room!");
-            return;
-        }
+            int selectedRow = roomsTable.getSelectedRow();
+            if(selectedRow == -1){
+                invisibleLabel.setText("Please select a room!");
+                return;
+            }
             String roomNo = (String)roomsTable.getModel().getValueAt(selectedRow, 0);
             String floor = (String)roomsTable.getModel().getValueAt(selectedRow, 1);
             String libId = (String)roomsTable.getModel().getValueAt(selectedRow, 3);
@@ -262,9 +302,55 @@ public class RoomsFilterPage extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_reserveButtonActionPerformed
 
+    private void reservedRoomsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reservedRoomsButtonActionPerformed
+        ClearAllRowsInTable();
+        PopulateTableWithReservedRooms();
+        reserveButton.setEnabled(false);
+    }//GEN-LAST:event_reservedRoomsButtonActionPerformed
+
+    private void checkoutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkoutButtonActionPerformed
+        try{
+            int selectedRow = roomsTable.getSelectedRow();
+            if(selectedRow == -1){
+                invisibleLabel.setText("Please select a room!");
+                return;
+            }
+            String roomNo = (String)roomsTable.getModel().getValueAt(selectedRow, 0);
+            if (RoomsHelper.CheckoutRoom(getRoomsTableName(), m_UserId, roomNo)){
+                invisibleLabel.setText("Room has been Checkedout!");
+                return;
+            }
+            invisibleLabel.setText("Room cannot be Checkedout!");
+        }
+        catch (Exception e) {
+            Logger.getLogger(RoomsFilterPage.class.getName()).log(Level.SEVERE, null, e);
+        }
+    }//GEN-LAST:event_checkoutButtonActionPerformed
+
+    private void checkinButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkinButtonActionPerformed
+        try{
+            int selectedRow = roomsTable.getSelectedRow();
+            if(selectedRow == -1){
+                invisibleLabel.setText("Please select a room!");
+                return;
+            }
+            String roomNo = (String)roomsTable.getModel().getValueAt(selectedRow, 0);
+            if (RoomsHelper.CheckinRoom(getRoomsTableName(), m_UserId, roomNo)){
+                invisibleLabel.setText("Room has been Checkedin!");
+                return;
+            }
+            invisibleLabel.setText("Room cannot be Checkedin!");
+        }
+        catch (Exception e) {
+            Logger.getLogger(RoomsFilterPage.class.getName()).log(Level.SEVERE, null, e);
+        }
+    }//GEN-LAST:event_checkinButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel capacityLabel;
     private javax.swing.JSpinner capacitySpinner;
+    private javax.swing.JButton checkinButton;
+    private javax.swing.JButton checkoutButton;
     private javax.swing.JButton findRoomsButton;
     private javax.swing.JLabel fromLabel;
     private javax.swing.JSpinner fromSpinner;
@@ -274,6 +360,7 @@ public class RoomsFilterPage extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton reserveButton;
+    private javax.swing.JButton reservedRoomsButton;
     private javax.swing.JLabel roomsLabel;
     private javax.swing.JTable roomsTable;
     private javax.swing.JLabel toLabel;
@@ -355,6 +442,15 @@ public class RoomsFilterPage extends javax.swing.JFrame {
         int rowCount = m_Model.getRowCount();
         for (int i = 0; i < rowCount; i++){
             m_Model.removeRow(0);
+        }
+    }
+
+    private void PopulateTableWithReservedRooms() {
+        try{
+            RoomsHelper.AddReservedRoomsToTable(getRoomsTableName(), m_UserId, m_Model);
+        }
+        catch (Exception e) {
+            Logger.getLogger(RoomsFilterPage.class.getName()).log(Level.SEVERE, null, e);
         }
     }
 }

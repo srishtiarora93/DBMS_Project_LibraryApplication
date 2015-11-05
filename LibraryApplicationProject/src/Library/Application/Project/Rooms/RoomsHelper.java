@@ -26,20 +26,37 @@ public class RoomsHelper {
     private static final SimpleDateFormat m_SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private static final String m_StudyRoomsTable = "STUDYROOMS";
+    private static final String m_StudyRoomsColRoomNo = "ROOMNO";
+    private static final String m_StudyRoomsColFloor = "FLOOR";
+    private static final String m_StudyRoomsColCapacity = "CAPACITY";
+    private static final String m_StudyRoomsColLibId = "LIBRARYID";
+    
+    private static final String m_ConfRoomsColRoomNo = "ROOMNO";
+    private static final String m_ConfRoomsColFloor = "FLOOR";
+    private static final String m_ConfRoomsColCapacity = "CAPACITY";
+    private static final String m_ConfRoomsColLibId = "LIBRARYID";
     
     private static final String m_StudyRoomResTable = "STUDYROOMRESERVATION";
+    private static final String m_StudyRoomResUserId = "USERID";
     private static final String m_StudyRoomResRoomNo = "ROOMNO";
     private static final String m_StudyRoomResLibId = "LIBRARYID";
     private static final String m_StudyRoomResStDate = "STARTDATE";
     private static final String m_StudyRoomResEndDate = "ENDDATE";
+    private static final String m_StudyRoomResChkOutDeadlineDate = "CHECKOUTDEADLINE";
+    private static final String m_StudyRoomResChkOutDate = "CHECKOUTDATETIME";
     private static final String m_StudyRoomResChkInDate = "CHECKINDATETIME";
+    private static final String m_StudyRoomResIsVoid = "ISVOID";
     
     private static final String m_ConfRoomResTable = "CONFERENCEROOMRESERVATION";
+    private static final String m_ConfRoomResUserId = "USERID";
     private static final String m_ConfRoomResRoomNo = "ROOMNO";
     private static final String m_ConfRoomResLibId = "LIBRARYID";
     private static final String m_ConfRoomResStDate = "STARTDATE";
     private static final String m_ConfRoomResEndDate = "ENDDATE";
+    private static final String m_ConfRoomResChkOutDeadlineDate = "CHECKOUTDEADLINE";
+    private static final String m_ConfRoomResChkOutDate = "CHECKOUTDATETIME";
     private static final String m_ConfRoomResChkInDate = "CHECKINDATETIME";
+    private static final String m_ConfRoomResIsVoid = "ISVOID";
 
     static void AddRoomsToTable(String tableName, 
             String colRoomNo, 
@@ -117,9 +134,10 @@ public class RoomsHelper {
                     String reservation = String.format("SELECT * FROM %s "
                     + "WHERE %s = '%s' AND "
                     + "%s = '%s' AND "
-                    + "%s is NULL", m_StudyRoomResTable, m_StudyRoomResRoomNo, roomNo,
+                    + "%s is NULL AND "
+                    + "%s = 'N'", m_StudyRoomResTable, m_StudyRoomResRoomNo, roomNo,
                     m_StudyRoomResLibId, libId,
-                    m_StudyRoomResChkInDate);
+                    m_StudyRoomResChkInDate, m_StudyRoomResIsVoid);
                     try (IQueryResultSet result = stmtExecutor.executeQuery(reservation)){
                         while(result.getResultSet().next()){
                             String start = result.getString(m_StudyRoomResStDate);
@@ -144,9 +162,10 @@ public class RoomsHelper {
                     String reservation = String.format("SELECT * FROM %s "
                     + "WHERE %s = '%s' AND "
                     + "%s = '%s' AND "
-                    + "%s is NULL", m_ConfRoomResTable, m_ConfRoomResRoomNo, roomNo,
+                    + "%s is NULL AND "
+                    + "%s = 'N'", m_ConfRoomResTable, m_ConfRoomResRoomNo, roomNo,
                     m_ConfRoomResLibId, libId,
-                    m_ConfRoomResChkInDate);
+                    m_ConfRoomResChkInDate, m_ConfRoomResIsVoid);
                     try (IQueryResultSet result = stmtExecutor.executeQuery(reservation)){
                         while(result.getResultSet().next()){
                             String start = result.getString(m_ConfRoomResStDate);
@@ -195,10 +214,240 @@ public class RoomsHelper {
                         + "TO_DATE('%s', 'YYYY/MM/DD HH24:MI:SS'), "
                         + "TO_DATE('%s', 'YYYY/MM/DD HH24:MI:SS'), "
                         + "TO_DATE('%s', 'YYYY/MM/DD HH24:MI:SS'), "
-                        + "NULL, NULL)", reservationTable, 
+                        + "NULL, NULL, 'N')", reservationTable, 
                         userId, roomNo, libId,
                         fromDate, toDate, checkout);
                 stmtExecutor.executeUpdate(reserve);
+            }
+        }
+    }
+
+    static void AddReservedRoomsToTable(String roomsTableName, String userId, 
+            DefaultTableModel model) throws Exception{
+        String reservationTable = getResTableName(roomsTableName);
+        switch (reservationTable){
+            case m_StudyRoomResTable:
+            try (IDatabaseConnection connection = DatabaseConnectionService.createDatabaseConnection()){
+                try (IStatementExecutor stmtExecutor = DatabaseConnectionService.createStatementExecutor(connection)){
+                    String reservation = String.format("SELECT * FROM %s "
+                        + "WHERE %s = '%s' AND "
+                        + "%s is NULL AND "
+                        + "%s = 'N'", m_StudyRoomResTable, m_StudyRoomResUserId, userId,
+                        m_StudyRoomResChkInDate, m_StudyRoomResIsVoid);
+                    try (IQueryResultSet result = stmtExecutor.executeQuery(reservation)){
+                        while(result.getResultSet().next()){
+                            String roomNo = result.getString(m_StudyRoomsColRoomNo);
+                            String libId = result.getString(m_StudyRoomsColLibId);
+                            AddRoomToTable(roomsTableName, roomNo, libId, model);
+                        }
+                    }
+                }
+            }
+            break;
+            case m_ConfRoomResTable:
+            try (IDatabaseConnection connection = DatabaseConnectionService.createDatabaseConnection()){
+                try (IStatementExecutor stmtExecutor = DatabaseConnectionService.createStatementExecutor(connection)){
+                    String reservation = String.format("SELECT * FROM %s "
+                        + "WHERE %s = '%s' AND "
+                        + "%s is NULL AND "
+                        + "%s = 'N'", m_ConfRoomResTable, m_ConfRoomResUserId, userId,
+                        m_ConfRoomResChkInDate, m_ConfRoomResIsVoid);
+                    try (IQueryResultSet result = stmtExecutor.executeQuery(reservation)){
+                        while(result.getResultSet().next()){
+                            String roomNo = result.getString(m_ConfRoomsColRoomNo);
+                            String libId = result.getString(m_ConfRoomsColLibId);
+                            AddRoomToTable(roomsTableName, roomNo, libId, model);
+                        }
+                    }
+                }
+            }
+            break;
+        }
+    }
+
+    static boolean CheckoutRoom(String roomsTableName, String userId, 
+        String roomNo) throws Exception{
+        String reservationTable = getResTableName(roomsTableName);
+        Date currentDate = new Date();
+        String currentDateString = m_SimpleDateFormat.format(currentDate);
+        switch (reservationTable){
+            case m_StudyRoomResTable:
+                try (IDatabaseConnection connection = DatabaseConnectionService.createDatabaseConnection()){
+                try (IStatementExecutor stmtExecutor = DatabaseConnectionService.createStatementExecutor(connection)){
+                    String reservation = String.format("SELECT * FROM %s "
+                        + "WHERE %s = '%s' AND "
+                        + "%s = '%s' AND "
+                        + "%s is NULL AND "
+                        + "%s is NULL AND "
+                        + "%s = 'N'", m_StudyRoomResTable, m_StudyRoomResUserId, userId,
+                        m_StudyRoomResRoomNo, roomNo,
+                        m_StudyRoomResChkOutDate,
+                        m_StudyRoomResChkInDate, m_StudyRoomResIsVoid);
+                    try (IQueryResultSet result = stmtExecutor.executeQuery(reservation)){
+                        while(result.getResultSet().next()){
+                            String start = result.getString(m_StudyRoomResStDate);
+                            Date startDate = m_SimpleDateFormat.parse(start);
+                            String checkoutDeadline = result.getString(m_StudyRoomResChkOutDeadlineDate);
+                            Date checkoutDeadlineDate = m_SimpleDateFormat.parse(checkoutDeadline);
+                            if (startDate.before(currentDate) && currentDate.before(checkoutDeadlineDate)){
+                                String checkout = String.format("UPDATE %s "
+                                + "SET %s = TO_DATE('%s', 'YYYY/MM/DD HH24:MI:SS') "
+                                + "WHERE %s = '%s' AND "
+                                + "%s = '%s' AND "
+                                + "%s is NULL AND "
+                                + "%s is NULL AND "
+                                + "%s = 'N'", m_StudyRoomResTable, 
+                                m_StudyRoomResChkOutDate, currentDateString,
+                                m_StudyRoomResUserId, userId,
+                                m_StudyRoomResRoomNo, roomNo,
+                                m_StudyRoomResChkOutDate,
+                                m_StudyRoomResChkInDate, m_StudyRoomResIsVoid);
+                                stmtExecutor.executeUpdate(checkout);
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+            case m_ConfRoomResTable:
+                try (IDatabaseConnection connection = DatabaseConnectionService.createDatabaseConnection()){
+                try (IStatementExecutor stmtExecutor = DatabaseConnectionService.createStatementExecutor(connection)){
+                    String reservation = String.format("SELECT * FROM %s "
+                        + "WHERE %s = '%s' AND "
+                        + "%s = '%s' AND "
+                        + "%s is NULL AND "
+                        + "%s is NULL AND "
+                        + "%s = 'N'", m_ConfRoomResTable, m_ConfRoomResUserId, userId,
+                        m_ConfRoomResRoomNo, roomNo,
+                        m_ConfRoomResChkOutDate,
+                        m_ConfRoomResChkInDate, m_ConfRoomResIsVoid);
+                    try (IQueryResultSet result = stmtExecutor.executeQuery(reservation)){
+                        while(result.getResultSet().next()){
+                            String start = result.getString(m_ConfRoomResStDate);
+                            Date startDate = m_SimpleDateFormat.parse(start);
+                            String checkoutDeadline = result.getString(m_ConfRoomResChkOutDeadlineDate);
+                            Date checkoutDeadlineDate = m_SimpleDateFormat.parse(checkoutDeadline);
+                            if (startDate.before(currentDate) && currentDate.before(checkoutDeadlineDate)){
+                                String checkout = String.format("UPDATE %s "
+                                + "SET %s = TO_DATE('%s', 'YYYY/MM/DD HH24:MI:SS') "
+                                + "WHERE %s = '%s' AND "
+                                + "%s = '%s' AND "
+                                + "%s is NULL AND "
+                                + "%s is NULL AND "
+                                + "%s = 'N'", m_ConfRoomResTable, 
+                                m_ConfRoomResChkOutDate, currentDateString,
+                                m_ConfRoomResUserId, userId,
+                                m_ConfRoomResRoomNo, roomNo,
+                                m_ConfRoomResChkOutDate,
+                                m_ConfRoomResChkInDate, m_ConfRoomResIsVoid);
+                                stmtExecutor.executeUpdate(checkout);
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+        throw new IllegalStateException("Illegal State");
+    }
+
+    static boolean CheckinRoom(String roomsTableName, String userId, 
+        String roomNo) throws Exception{
+        String reservationTable = getResTableName(roomsTableName);
+        Date currentDate = new Date();
+        String currentDateString = m_SimpleDateFormat.format(currentDate);
+        switch (reservationTable){
+            case m_StudyRoomResTable:
+                try (IDatabaseConnection connection = DatabaseConnectionService.createDatabaseConnection()){
+                try (IStatementExecutor stmtExecutor = DatabaseConnectionService.createStatementExecutor(connection)){
+                    String reservation = String.format("SELECT * FROM %s "
+                        + "WHERE %s = '%s' AND "
+                        + "%s = '%s' AND "
+                        + "%s is NOT NULL AND "
+                        + "%s is NULL AND "
+                        + "%s = 'N'", m_StudyRoomResTable, m_StudyRoomResUserId, userId,
+                        m_StudyRoomResRoomNo, roomNo,
+                        m_StudyRoomResChkOutDate,
+                        m_StudyRoomResChkInDate, m_StudyRoomResIsVoid);
+                    try (IQueryResultSet result = stmtExecutor.executeQuery(reservation)){
+                        while(result.getResultSet().next()){
+                            String checkout = String.format("UPDATE %s "
+                            + "SET %s = TO_DATE('%s', 'YYYY/MM/DD HH24:MI:SS') "
+                            + "WHERE %s = '%s' AND "
+                            + "%s = '%s' AND "
+                            + "%s is NOT NULL AND "
+                            + "%s is NULL AND "
+                            + "%s = 'N'", m_StudyRoomResTable, 
+                            m_StudyRoomResChkInDate, currentDateString,
+                            m_StudyRoomResUserId, userId,
+                            m_StudyRoomResRoomNo, roomNo,
+                            m_StudyRoomResChkOutDate,
+                            m_StudyRoomResChkInDate, m_StudyRoomResIsVoid);
+                            stmtExecutor.executeUpdate(checkout);
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+            case m_ConfRoomResTable:
+                try (IDatabaseConnection connection = DatabaseConnectionService.createDatabaseConnection()){
+                try (IStatementExecutor stmtExecutor = DatabaseConnectionService.createStatementExecutor(connection)){
+                    String reservation = String.format("SELECT * FROM %s "
+                        + "WHERE %s = '%s' AND "
+                        + "%s = '%s' AND "
+                        + "%s is NOT NULL AND "
+                        + "%s is NULL AND "
+                        + "%s = 'N'", m_ConfRoomResTable, m_ConfRoomResUserId, userId,
+                        m_ConfRoomResRoomNo, roomNo,
+                        m_ConfRoomResChkOutDate,
+                        m_ConfRoomResChkInDate, m_ConfRoomResIsVoid);
+                    try (IQueryResultSet result = stmtExecutor.executeQuery(reservation)){
+                        while(result.getResultSet().next()){
+                            String checkout = String.format("UPDATE %s "
+                            + "SET %s = TO_DATE('%s', 'YYYY/MM/DD HH24:MI:SS') "
+                            + "WHERE %s = '%s' AND "
+                            + "%s = '%s' AND "
+                            + "%s is NOT NULL AND "
+                            + "%s is NULL AND "
+                            + "%s = 'N'", m_ConfRoomResTable, 
+                            m_ConfRoomResChkInDate, currentDateString,
+                            m_ConfRoomResUserId, userId,
+                            m_ConfRoomResRoomNo, roomNo,
+                            m_ConfRoomResChkOutDate,
+                            m_ConfRoomResChkInDate, m_ConfRoomResIsVoid);
+                            stmtExecutor.executeUpdate(checkout);
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+        throw new IllegalStateException("Illegal State");
+    }
+
+    private static void AddRoomToTable(String roomsTableName, String roomNo, 
+            String libId, DefaultTableModel model) throws Exception{
+        try (IDatabaseConnection connection = DatabaseConnectionService.createDatabaseConnection()){
+            try (IStatementExecutor stmtExecutor = DatabaseConnectionService.createStatementExecutor(connection)){
+                String room = String.format("SELECT * FROM %s "
+                    + "WHERE %s = '%s' AND "
+                    + "%s = '%s'", roomsTableName, 
+                    m_StudyRoomsColRoomNo, roomNo,
+                    m_StudyRoomsColLibId, libId);
+                try (IQueryResultSet result = stmtExecutor.executeQuery(room)){
+                    while(result.getResultSet().next()){
+                        model.addRow(new String[] {
+                        result.getString(m_StudyRoomsColRoomNo), 
+                        result.getString(m_StudyRoomsColFloor),
+                        result.getString(m_StudyRoomsColCapacity),
+                        result.getString(m_StudyRoomsColLibId),
+                        getLibraryName(connection, result.getString(m_StudyRoomsColLibId))});
+                    }
+                }
             }
         }
     }

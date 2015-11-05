@@ -95,6 +95,7 @@ class HardcopyBookCheckoutStrategy extends PublicationsCheckoutStrategy{
                     bookId, m_ColNameBookIdWaitlist,
                     m_ColNameDateWaitlist, m_ColNameUserId);
             if(!userName.isEmpty()){
+                CheckoutStrategyHelper.DeleteBookFromWaitlist(m_WaitlistTable, bookId, userName);
                 this.CheckoutBook(bookId, userName);
             }
         }

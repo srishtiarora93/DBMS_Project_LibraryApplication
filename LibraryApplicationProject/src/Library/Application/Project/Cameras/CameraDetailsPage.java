@@ -20,7 +20,7 @@ import javax.swing.table.DefaultTableModel;
 public class CameraDetailsPage extends javax.swing.JFrame {
 
     private static final long HOUR = 3600*1000;
-    private static final int Week_To_Hours = 7 * 24;
+    private static final int Week_To_Hours = 6 * 24;
     private static final SimpleDateFormat m_DayOfWeekFormat = new SimpleDateFormat("E");
     private static final SimpleDateFormat m_SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final SimpleDateFormat m_OnlyDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -39,14 +39,26 @@ public class CameraDetailsPage extends javax.swing.JFrame {
             String userId,
             String cameraId) {
         initComponents();
-        reserveButton.setEnabled(false);
-        waitlistButton.setEnabled(false);
+        DisableButtons();
         
         this.m_CamerasPage = camerasPage;
         this.m_UserId = userId;
         this.m_CameraId = cameraId;
+        
         CreateTableModel();
         PopulateDetailsPage();
+    }
+
+    private void DisableButtons() {
+        SetEnabledForButtons(false, false, false, false);
+    }
+    
+    private void SetEnabledForButtons(boolean reserveBtn, boolean waitlistBtn,
+            boolean checkoutBtn, boolean checkinBtn) {
+        reserveButton.setEnabled(reserveBtn);
+        waitlistButton.setEnabled(waitlistBtn);
+        checkoutButton.setEnabled(checkoutBtn);
+        checkinButton.setEnabled(checkinBtn);
     }
     
     private void CreateTableModel() {
@@ -74,6 +86,8 @@ public class CameraDetailsPage extends javax.swing.JFrame {
         goBackButton = new javax.swing.JButton();
         reserveButton = new javax.swing.JButton();
         waitlistButton = new javax.swing.JButton();
+        checkoutButton = new javax.swing.JButton();
+        checkinButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -121,6 +135,20 @@ public class CameraDetailsPage extends javax.swing.JFrame {
             }
         });
 
+        checkoutButton.setText("Checkout");
+        checkoutButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkoutButtonActionPerformed(evt);
+            }
+        });
+
+        checkinButton.setText("Checkin");
+        checkinButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkinButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -140,10 +168,12 @@ public class CameraDetailsPage extends javax.swing.JFrame {
                                         .addComponent(goBackButton)))
                                 .addGap(46, 46, 46)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(checkoutButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(reserveButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(availabilityButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(dateSpinner)
-                                    .addComponent(waitlistButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                    .addComponent(waitlistButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(checkinButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                         .addGap(0, 63, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -160,12 +190,16 @@ public class CameraDetailsPage extends javax.swing.JFrame {
                 .addComponent(availabilityButton)
                 .addGap(29, 29, 29)
                 .addComponent(invisibleLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
                 .addComponent(reserveButton)
-                .addGap(27, 27, 27)
+                .addGap(18, 18, 18)
+                .addComponent(waitlistButton)
+                .addGap(18, 18, 18)
+                .addComponent(checkoutButton)
+                .addGap(19, 19, 19)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(goBackButton)
-                    .addComponent(waitlistButton))
+                    .addComponent(checkinButton))
                 .addGap(31, 31, 31))
         );
 
@@ -174,33 +208,51 @@ public class CameraDetailsPage extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void availabilityButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_availabilityButtonActionPerformed
-        Date date = (Date)dateSpinner.getValue();
-        if(!IsDayFriday(date)){
-            invisibleLabel.setText("Please choose a friday!");
-            return;
-        }
-        if(IsCameraAvailable()){
-            reserveButton.setEnabled(true);
-            waitlistButton.setEnabled(false);
+        if (IsCameraAvailable()){
+            SetEnabledForButtons(true, false, false, false);
             invisibleLabel.setText("You may reserve the camera!");
             return;
         }
         if(IsCameraReservedByUser(m_UserId)){
-            reserveButton.setEnabled(false);
-            waitlistButton.setEnabled(false);
+            if (IsCameraCheckedOut()){
+                SetEnabledForButtons(false, false, false, true);
+                invisibleLabel.setText("You have checkin the camera!");
+                return;
+            }
+            
+            if (CanCameraBeCheckedOut()){
+                SetEnabledForButtons(false, false, true, false);
+                invisibleLabel.setText("You have checkout the camera!");
+                return;
+            }
+            
+            DisableButtons();
             invisibleLabel.setText("You have reserved this camera on the date!");
             return;
         }
         if(IsCameraWaitlistedByUser(m_UserId)){
-            reserveButton.setEnabled(false);
-            waitlistButton.setEnabled(false);
+            DisableButtons();
             invisibleLabel.setText("You have waitlisted this camera on the date!");
             return;
         }
-        reserveButton.setEnabled(false);
-        waitlistButton.setEnabled(true);
+        SetEnabledForButtons(false, true, false, false);
         invisibleLabel.setText("This camera is not available, you may add it to waitlist!");
     }//GEN-LAST:event_availabilityButtonActionPerformed
+
+    private boolean NotValidDate() {
+        Date date = (Date)dateSpinner.getValue();
+        if (!IsDateValid(date)) {
+            DisableButtons();
+            invisibleLabel.setText("Please choose a valid date!");
+            return true;
+        }
+        if (!IsDayFriday(date)) {
+            DisableButtons();
+            invisibleLabel.setText("Please choose a friday!");
+            return true;
+        }
+        return false;
+    }
 
     private void goBackButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goBackButtonActionPerformed
         this.dispose();
@@ -208,16 +260,12 @@ public class CameraDetailsPage extends javax.swing.JFrame {
     }//GEN-LAST:event_goBackButtonActionPerformed
 
     private void reserveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveButtonActionPerformed
-        Date date = (Date)dateSpinner.getValue();
-        if(!IsDayFriday(date)){
-            invisibleLabel.setText("Please choose a friday!");
-            return;
-        }
+        if (NotValidDate())return;
         try {
             CamerasHelper.ReserveTheCamera(m_UserId, m_CameraId, 
                     getDateWithTimeSetToNineAm(), getEndDate(),
                     getCheckoutEndTime());
-            reserveButton.setEnabled(false);
+            DisableButtons();
             invisibleLabel.setText("Camera Reserved!");
         }
         catch (Exception e) {
@@ -226,9 +274,10 @@ public class CameraDetailsPage extends javax.swing.JFrame {
     }//GEN-LAST:event_reserveButtonActionPerformed
 
     private void waitlistButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_waitlistButtonActionPerformed
+        if (NotValidDate())return;
         try {
             CamerasHelper.AddCameraToWaitList(m_UserId, m_CameraId, getDateWithTimeSetToNineAm());
-            waitlistButton.setEnabled(false);
+            DisableButtons();
             invisibleLabel.setText("Camera added to wait queue!");
         }
         catch (Exception e) {
@@ -236,8 +285,33 @@ public class CameraDetailsPage extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_waitlistButtonActionPerformed
 
+    private void checkoutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkoutButtonActionPerformed
+        if (NotValidDate())return;
+        try {
+            CamerasHelper.CheckoutCamera(m_UserId, m_CameraId, getDateWithTimeSetToNineAm());
+            DisableButtons();
+            invisibleLabel.setText("Camera checked out!");
+        }
+        catch (Exception e) {
+            Logger.getLogger(CameraDetailsPage.class.getName()).log(Level.SEVERE, null, e);
+        }
+    }//GEN-LAST:event_checkoutButtonActionPerformed
+
+    private void checkinButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkinButtonActionPerformed
+        try {
+            CamerasHelper.CheckinCamera(m_UserId, m_CameraId, getDateWithTimeSetToNineAm());
+            DisableButtons();
+            invisibleLabel.setText("Camera checked in!");
+        }
+        catch (Exception e) {
+            Logger.getLogger(CameraDetailsPage.class.getName()).log(Level.SEVERE, null, e);
+        }
+    }//GEN-LAST:event_checkinButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton availabilityButton;
+    private javax.swing.JButton checkinButton;
+    private javax.swing.JButton checkoutButton;
     private javax.swing.JLabel dateLabel;
     private javax.swing.JSpinner dateSpinner;
     private javax.swing.JTable detailsTable;
@@ -306,6 +380,31 @@ public class CameraDetailsPage extends javax.swing.JFrame {
     private boolean IsCameraWaitlistedByUser(String m_UserId) {
         try {
             return CamerasHelper.IsCameraWaitlistedOnDateByUser(m_CameraId, m_UserId, getDateWithTimeSetToNineAm());
+        }
+        catch (Exception e) {
+            Logger.getLogger(CameraDetailsPage.class.getName()).log(Level.SEVERE, null, e);
+        }
+        return false;
+    }
+
+    private boolean IsDateValid(Date date) {
+        Date currentDate = new Date();
+        return currentDate.before(date);
+    }
+
+    private boolean CanCameraBeCheckedOut() {
+        try {
+            return CamerasHelper.CanCameraBeCheckedOut(m_CameraId, m_UserId, getDateWithTimeSetToNineAm());
+        }
+        catch (Exception e) {
+            Logger.getLogger(CameraDetailsPage.class.getName()).log(Level.SEVERE, null, e);
+        }
+        return false;
+    }
+
+    private boolean IsCameraCheckedOut() {
+         try {
+            return CamerasHelper.IsCameraCheckedOut(m_CameraId, m_UserId, getDateWithTimeSetToNineAm());
         }
         catch (Exception e) {
             Logger.getLogger(CameraDetailsPage.class.getName()).log(Level.SEVERE, null, e);

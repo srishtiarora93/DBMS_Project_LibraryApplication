@@ -27,12 +27,15 @@ public class CamerasHelper {
     private static final String m_ColMemory = "MEMORY";
     private static final String m_ColConfig = "CONFIGURATION";
     private static final String m_ColLibraryId = "LIBRARYID";
+    private static final String m_ColAvailable = "ISAVAILABLE";
     
     private static final String m_CameraReqTable = "CAMERAREQUESTS";
     private static final String m_ColCamReqCamId = "CAMERAID";
     private static final String m_ColCamReqUserId = "USERID";
     private static final String m_ColCamReqStartDate = "STARTDATE";
     private static final String m_ColCamReqChkInDate = "CHECKINDATETIME";
+    private static final String m_ColCamReqChkOutDate = "CHECKOUTTIME";
+    private static final String m_ColCamReqChkOutEndDate = "CHECKOUTENDTIME";
     
     private static final String m_LibraryTable = "LIBRARIES";
     private static final String m_LibColLibId = "LIBRARYID";
@@ -190,6 +193,107 @@ public class CamerasHelper {
                 try(IQueryResultSet resultSet = stmtExecutor.executeQuery(cameraWaitlist)){
                     return !resultSet.isEmpty();
                 }
+            }
+        }
+    }
+
+    static boolean CanCameraBeCheckedOut(String cameraId, String userId, 
+            String startDate) throws Exception{
+        Date currentDate = new Date();
+        try (IDatabaseConnection connection = DatabaseConnectionService.createDatabaseConnection()){
+            try (IStatementExecutor stmtExecutor = DatabaseConnectionService.createStatementExecutor(connection)){
+                String cameraRequest = String.format("SELECT * FROM %s " + 
+                        "WHERE %s = '%s' "
+                        + "AND %s = '%s' " + 
+                        "AND %s = TO_DATE('%s', 'YYYY/MM/DD HH24:MI:SS') " + 
+                        "AND %s is NULL", m_CameraReqTable, 
+                        m_ColCamReqUserId, userId,
+                        m_ColCamReqCamId, cameraId, 
+                        m_ColCamReqStartDate, startDate, 
+                        m_ColCamReqChkInDate);
+                try(IQueryResultSet resultSet = stmtExecutor.executeQuery(cameraRequest)){
+                    resultSet.moveToFirstRow();
+                    String checkoutEndTime = resultSet.getString(m_ColCamReqChkOutEndDate);
+                    Date checkoutEndDate = m_SimpleDateFormat.parse(checkoutEndTime);
+                    Date start = m_SimpleDateFormat.parse(startDate);
+                    return start.before(currentDate) && currentDate.before(checkoutEndDate);
+                }
+            }
+        }
+    }
+
+    static boolean IsCameraCheckedOut(String cameraId, String userId, 
+            String startDate) throws Exception{
+        try (IDatabaseConnection connection = DatabaseConnectionService.createDatabaseConnection()){
+            try (IStatementExecutor stmtExecutor = DatabaseConnectionService.createStatementExecutor(connection)){
+                String cameraRequest = String.format("SELECT * FROM %s " 
+                        + "WHERE %s = '%s' "
+                        + "AND %s = '%s' " 
+                        + "AND %s = TO_DATE('%s', 'YYYY/MM/DD HH24:MI:SS') "
+                        + "AND %s is NOT NULL " 
+                        + "AND %s is NULL", m_CameraReqTable, 
+                        m_ColCamReqUserId, userId,
+                        m_ColCamReqCamId, cameraId, 
+                        m_ColCamReqStartDate, startDate, 
+                        m_ColCamReqChkOutDate,
+                        m_ColCamReqChkInDate);
+                try(IQueryResultSet resultSet = stmtExecutor.executeQuery(cameraRequest)){
+                    return !resultSet.isEmpty();
+                }
+            }
+        }
+    }
+
+    static void CheckoutCamera(String userId, String cameraId, 
+            String startDate) throws Exception{
+        String currentDate = m_SimpleDateFormat.format(new Date());
+        try (IDatabaseConnection connection = DatabaseConnectionService.createDatabaseConnection()){
+            try (IStatementExecutor stmtExecutor = DatabaseConnectionService.createStatementExecutor(connection)){
+                String checkout = String.format("UPDATE %s "
+                        + "SET %s = TO_DATE('%s', 'YYYY/MM/DD HH24:MI:SS')" 
+                        + "WHERE %s = '%s' "
+                        + "AND %s = '%s' " 
+                        + "AND %s = TO_DATE('%s', 'YYYY/MM/DD HH24:MI:SS') "
+                        + "AND %s is NULL", m_CameraReqTable, 
+                        m_ColCamReqChkOutDate, currentDate,
+                        m_ColCamReqUserId, userId,
+                        m_ColCamReqCamId, cameraId, 
+                        m_ColCamReqStartDate, startDate, 
+                        m_ColCamReqChkInDate);
+                stmtExecutor.executeUpdate(checkout);
+                String update = String.format("UPDATE %s "
+                        + "SET %s = '%s' "
+                        + "WHERE %s = '%s'", m_CamerasTable,
+                        m_ColAvailable, "N",
+                        m_ColId, cameraId);
+                stmtExecutor.executeUpdate(update);
+            }
+        }
+    }
+
+    static void CheckinCamera(String userId, String cameraId, 
+            String startDate) throws Exception{
+        String currentDate = m_SimpleDateFormat.format(new Date());
+        try (IDatabaseConnection connection = DatabaseConnectionService.createDatabaseConnection()){
+            try (IStatementExecutor stmtExecutor = DatabaseConnectionService.createStatementExecutor(connection)){
+                String checkout = String.format("UPDATE %s "
+                        + "SET %s = TO_DATE('%s', 'YYYY/MM/DD HH24:MI:SS')" 
+                        + "WHERE %s = '%s' "
+                        + "AND %s = '%s' " 
+                        + "AND %s = TO_DATE('%s', 'YYYY/MM/DD HH24:MI:SS') "
+                        + "AND %s is NULL", m_CameraReqTable, 
+                        m_ColCamReqChkInDate, currentDate,
+                        m_ColCamReqUserId, userId,
+                        m_ColCamReqCamId, cameraId, 
+                        m_ColCamReqStartDate, startDate, 
+                        m_ColCamReqChkInDate);
+                stmtExecutor.executeUpdate(checkout);
+                String update = String.format("UPDATE %s "
+                        + "SET %s = '%s' "
+                        + "WHERE %s = '%s'", m_CamerasTable,
+                        m_ColAvailable, "Y",
+                        m_ColId, cameraId);
+                stmtExecutor.executeUpdate(update);
             }
         }
     }

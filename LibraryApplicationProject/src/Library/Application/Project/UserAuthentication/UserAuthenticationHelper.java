@@ -31,7 +31,19 @@ class UserAuthenticationHelper {
         try (IDatabaseConnection connection = DatabaseConnectionService.createDatabaseConnection()){           
             try (IStatementExecutor stmtExecutor = DatabaseConnectionService.createStatementExecutor(connection)){
             String selectUser = String.format("SELECT * FROM Faculty " +
-                    "WHERE facultyNo= %s", userId);
+                    "WHERE facultyNo= '%s'", userId);
+                try (IQueryResultSet resultSet = stmtExecutor.executeQuery(selectUser)){
+                    return !resultSet.isEmpty();
+                }
+            }
+        }
+    }
+
+    static boolean IsStudentAccountHeld(String userId) throws Exception{
+        try (IDatabaseConnection connection = DatabaseConnectionService.createDatabaseConnection()){           
+            try (IStatementExecutor stmtExecutor = DatabaseConnectionService.createStatementExecutor(connection)){
+            String selectUser = String.format("SELECT * FROM HOLDUSER " +
+                    "WHERE USERID = '%s'", userId);
                 try (IQueryResultSet resultSet = stmtExecutor.executeQuery(selectUser)){
                     return !resultSet.isEmpty();
                 }
