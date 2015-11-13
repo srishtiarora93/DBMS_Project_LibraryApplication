@@ -197,7 +197,7 @@ public class RoomsHelper {
 
     private static String getResTableName(String tableName) {
         if (tableName.equals(m_StudyRoomsTable)) return m_StudyRoomResTable;
-        return m_ConfRoomResChkInDate;
+        return m_ConfRoomResTable;
     }
 
     static void ReserveRoom(String roomsTableName, 
